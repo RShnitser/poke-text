@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 	"fmt"
-	"context"
+	//"context"
 
 	 "github.com/joho/godotenv"
-	 openai "github.com/sashabaranov/go-openai"
+	 //openai "github.com/sashabaranov/go-openai"
 )
 
 func main(){
@@ -19,7 +19,7 @@ func main(){
 	 os.Exit(1)
 	}
    
-	api := os.Getenv("OPENAI_API_KEY")
+	//api := os.Getenv("OPENAI_API_KEY")
    
 	// client := openai.NewClient(api)
 	// resp, err := client.CreateChatCompletion(

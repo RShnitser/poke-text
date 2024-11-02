@@ -44,7 +44,7 @@ func getInput(scanner *bufio.Scanner)string{
 
 func printStart(){
 	fmt.Println("Pick your partner:")
-	fmt.Println("[1] Bulbasaur:")
+	fmt.Println("[1] Bulbasaur")
 	fmt.Println("[2] Charmander")
 	fmt.Println("[3] Squirtle")
 }
@@ -67,20 +67,47 @@ func processInputStart(state *gameState, input string){
 	}
 }
 
+func printTravel(){
+	fmt.Println("Pick location to explore:")
+	fmt.Println("[1] Cave")
+	fmt.Println("[2] Forest")
+	fmt.Println("[3] Tall Grass")
+	fmt.Println("[4] Coast")
+}
+
+func processInputTravel(state *gameState, input string){
+	fmt.Println("travel")
+}
+
+func printState(state *gameState){
+	switch(state.scene){
+	case Start:
+		printStart()
+	case Travel:
+		printTravel()
+	}
+}
+
+func processInput(state *gameState, input string){
+	switch(state.scene){
+	case Start:
+		processInputStart(state, input)
+	case Travel:
+		processInputTravel(state, input)
+	}
+}
+
 func (state *gameState)run(){
 	scanner := bufio.NewScanner(os.Stdin)
 	
 	for state.running{
 
-		switch(state.scene){
-		case Start:
-			printStart()
-		}
-		
+		printState(state)
 		input := getInput(scanner)
-		processInputStart(state, input)
+		processInput(state, input)
 		if input == "exit"{
 			state.running = false
+			return
 		}
 		//fmt.Println(input)
 	}
