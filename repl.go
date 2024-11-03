@@ -5,6 +5,7 @@ import(
 	"bufio"
 	"os"
 	"strings"
+	"math/rand"
 )
 
 type Scene int
@@ -13,26 +14,104 @@ const (
 	Travel
 )
 
-type ability struct{
-	name string
+type Ability int
+const (
+	Cut Ability = iota
+	Surf
+	Strength
+	Flash
+	Defog
+	RockSmash
+	Climb
+	Fly
+	Whirlpool
+	Waterfall
+	Dive
+)
+
+type Obstacle struct{
+	description string
+	solution Ability
 }
+
+//type obstacleHandle int
+type LocationData struct{
+	name string
+	//completed bool
+	obstacles []Ability
+}
+
+
+// type ability struct{
+// 	name string
+// }
 
 type pokemon struct{
 	name string
-	abilities []ability
+	abilities []Ability
 }
 
-type gameState struct{
+type gameData struct{
+	obstacles []Obstacle
+	locations []LocationData
+}
+
+type LocationState struct{
+	completed bool
+	progress int
+	path []Ability
+}
+
+type gameState struct{ 
+	data gameData
 	running bool
 	stamina int	
 	scene Scene
-	pokemon pokemon
+	daysLeft int
+	pokemon []pokemon
+	obstacles []LocationState
 }
 
 func (state *gameState)init(){
+	data := gameData{}
+	data.obstacles = []Obstacle{}
+	data.obstacles = append(data.obstacles, Obstacle{"A small tree blocks your path", Cut})
+	data.obstacles = append(data.obstacles, Obstacle{"You come across a still body of water", Surf})
+	data.obstacles = append(data.obstacles, Obstacle{"There is a rock blocking the way, but it looks like it can be moved with enough effort", Strength})
+	data.obstacles = append(data.obstacles, Obstacle{"The area you come across is dark, and it is very difficult to naviagate", Flash})
+	data.obstacles = append(data.obstacles, Obstacle{"The thick fog makes it very difficult to move further", Defog})
+	data.obstacles = append(data.obstacles, Obstacle{"Rocks in your way prevent you from moving further, but it looks like they can be broken", RockSmash})
+	data.obstacles = append(data.obstacles, Obstacle{"You will have to climb if you want to go further", Climb})
+	data.obstacles = append(data.obstacles, Obstacle{"You come across a crevice to wide to jump over", Fly})
+	data.obstacles = append(data.obstacles, Obstacle{"A raging whirlpool in the water is in your way", Whirlpool})
+	data.obstacles = append(data.obstacles, Obstacle{"You come across a waterfall", Waterfall})
+	data.obstacles = append(data.obstacles, Obstacle{"To proceed further will require going underwater", Dive})
+	
+	data.locations = []LocationData{}
+	data.locations = append(data.locations, LocationData{"Cave", []Ability{Surf, Strength, Flash, Dive, Whirlpool, Climb}})
+	data.locations = append(data.locations, LocationData{"Forest", []Ability{Cut, Flash, Defog, Climb, RockSmash}})
+	data.locations = append(data.locations, LocationData{"Tall Grass", []Ability{Cut, Defog, Fly, Strength, Climb}})
+	data.locations = append(data.locations, LocationData{"Coast", []Ability{Surf, Dive, Whirlpool, Waterfall, RockSmash}})
+
+	state.data = data
 	state.running = true
-	state.stamina = 10
+	state.stamina = 20
+	state.daysLeft = 10
 	state.scene = Start
+	state.pokemon = []pokemon{}
+
+	for _, loc := range data.locations{
+		locState := LocationState{}
+		locState.progress = 0
+		locState.completed = false
+		locState.path = []Ability{}
+
+		for i := 0; i < 5; i++{
+			randomObstacle := rand.Intn(len(loc.obstacles))
+			locState.path = append(locState.path, loc.obstacles[randomObstacle])
+		}
+		state.obstacles = append(state.obstacles, locState)
+	}
 }
 
 func getInput(scanner *bufio.Scanner)string{
@@ -54,11 +133,11 @@ func processInputStart(state *gameState, input string){
 	valid := true
 	switch(input){
 		case "1":
-			state.pokemon = pokemon{"Bulbasaur", nil}
+			state.pokemon = append(state.pokemon, pokemon{"Bulbasaur", []Ability{Cut, RockSmash}})
 		case "2":
-			state.pokemon = pokemon{"Charmander", nil}
+			state.pokemon = append(state.pokemon, pokemon{"Charmander", []Ability{Strength, Flash}})
 		case "3":
-			state.pokemon = pokemon{"Squirtle", nil}
+			state.pokemon = append(state.pokemon, pokemon{"Squirtle", []Ability{Surf, Dive}})
 		default:
 			valid = false
 	}
@@ -67,12 +146,15 @@ func processInputStart(state *gameState, input string){
 	}
 }
 
-func printTravel(){
+func printTravel(state *gameState){
 	fmt.Println("Pick location to explore:")
-	fmt.Println("[1] Cave")
-	fmt.Println("[2] Forest")
-	fmt.Println("[3] Tall Grass")
-	fmt.Println("[4] Coast")
+	// fmt.Println("[1] Cave")
+	// fmt.Println("[2] Forest")
+	// fmt.Println("[3] Tall Grass")
+	// fmt.Println("[4] Coast")
+	for i, loc := range state.data.locations{
+		fmt.Printf("[%d] %s\n", i + 1, loc.name)
+	}
 }
 
 func processInputTravel(state *gameState, input string){
@@ -84,7 +166,7 @@ func printState(state *gameState){
 	case Start:
 		printStart()
 	case Travel:
-		printTravel()
+		printTravel(state)
 	}
 }
 
