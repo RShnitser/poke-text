@@ -3,6 +3,7 @@ package main
 import(
 	"fmt"
 	"strconv"
+	"math/rand"
 )
 
 func printLocation(state *gameState){
@@ -29,7 +30,8 @@ func printLocation(state *gameState){
 	}
 	state.currentCost = cost
 	fmt.Printf("[1] %s (-%d stamina)\n", message, cost)
-	fmt.Printf("[2] Leave the%s\n", loc.name)
+	fmt.Printf("[2] Search for pokemon (-1 stamina)\n")
+	fmt.Printf("[3] Leave the %s\n", loc.name)
 }
 
 func processInputLocation(state *gameState, input string){
@@ -37,23 +39,17 @@ func processInputLocation(state *gameState, input string){
 	if err != nil{
 		return
 	}
-	if i < 1 || i > 2{
+	if i < 1 || i > 3{
 		return
 	}
 
 	if i == 1{
 		state.stamina -= state.currentCost
 		if state.stamina <= 0{
-			state.locations[state.currentLocation].progress = 0
-			fmt.Println("You and your pokemon are too exhausted to continue any further and must leave the area to rest")
-			state.stamina = 20
-			state.daysLeft -= 2
-			if state.daysLeft <= 0{
-				fmt.Println("You have taken too long and Mew has left the area")
-				return
-			}
-			//fmt.Println("")
-
+			
+			state.scene = Stamina
+			return
+		
 		}
 		state.locations[state.currentLocation].progress += 1
 		if state.locations[state.currentLocation].progress == 5{
@@ -61,5 +57,24 @@ func processInputLocation(state *gameState, input string){
 			state.scene = Travel
 			fmt.Println("You have found a clue to Mew's location!")
 		}
+	}else if i == 2{
+		data := state.data.locations[state.locations[state.currentLocation].dataIndex]
+		rand := rand.Intn(len(data.pokemon))
+		pokemon := data.pokemon[rand]
+		state.currentPokemon = pokemon
+		state.catchPercent = 25
+		state.escapePercent = 50
+		state.stamina -= 1
+		if state.stamina > 0{
+			state.scene = Capture
+			fmt.Printf("You encounter a wild %s\n", pokemon.name)
+		}else{
+			state.scene = Stamina
+		}
+		return
+	}else if i == 3{
+		fmt.Println("exiting")
+		state.scene = Travel
+		return
 	}
 }

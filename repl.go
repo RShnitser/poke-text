@@ -13,8 +13,9 @@ const (
 	Start Scene = iota
 	Travel
 	Location
-	//Exhausted
-	//OutOfTime
+	Capture
+	Stamina
+	Time
 )
 
 // type Ability string
@@ -78,6 +79,7 @@ type gameData struct{
 
 //type obstacleHandle int
 type LocationState struct{
+	dataIndex int
 	name string
 	completed bool
 	progress int
@@ -85,7 +87,7 @@ type LocationState struct{
 }
 
 type gameState struct{ 
-	data gameData
+	data *gameData
 	running bool
 	stamina int	
 	scene Scene
@@ -94,10 +96,13 @@ type gameState struct{
 	locations []LocationState
 	currentLocation int
 	currentCost int	
+	currentPokemon pokemon
+	catchPercent int
+	escapePercent int
 }
 
 func (state *gameState)init(){
-	data := gameData{}
+	var data *gameData = new(gameData)
 
 	data.abilityName = make(map[Ability]string)
 	data.abilityName[Cut] = "Cut"
@@ -144,7 +149,7 @@ func (state *gameState)init(){
 	grass.pokemon = append(grass.pokemon, pokemon{"Psyduck", []Ability{Surf}})
 	data.locations = append(data.locations, grass)
 
-	coast := LocationData{"Coast", []Ability{Surf, Dive, Whirlpool, Waterfall, RockSmash, []pokemon{}}
+	coast := LocationData{"Coast", []Ability{Surf, Dive, Whirlpool, Waterfall, RockSmash}, []pokemon{}}
 	coast.pokemon = append(coast.pokemon, pokemon{"Goldeen", []Ability{Waterfall}})
 	coast.pokemon = append(coast.pokemon, pokemon{"Seel", []Ability{Dive}})
 	coast.pokemon = append(coast.pokemon, pokemon{"Shellder", []Ability{Whirlpool}})
@@ -157,8 +162,9 @@ func (state *gameState)init(){
 	state.scene = Start
 	state.pokemon = []pokemon{}
 
-	for _, loc := range data.locations{
+	for i, loc := range data.locations{
 		locState := LocationState{}
+		locState.dataIndex = i
 		locState.progress = 0
 		locState.completed = false
 		locState.name = loc.name
@@ -216,6 +222,8 @@ func printState(state *gameState){
 		printTravel(state)
 	case Location:
 		printLocation(state)
+	case Capture:
+		printCatch(state)
 	}
 }
 
@@ -227,6 +235,8 @@ func processInput(state *gameState, input string){
 		processInputTravel(state, input)
 	case Location:
 		processInputLocation(state, input)
+	case Capture:
+		processInputCatch(state, input)
 	}
 }
 

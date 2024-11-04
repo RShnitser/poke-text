@@ -42,7 +42,7 @@ func main(){
 
 	// fmt.Println(resp.Choices[0].Message.Content)
 
-	state := gameState{}
+	var state *gameState = new(gameState)
 	state.init()
 	state.run()
 }
