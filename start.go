@@ -5,6 +5,10 @@ import(
 )
 
 func printStart(){
+	fmt.Println(
+`You have tracked down the elusive pokemon Mew to an island.  
+However, Mew won't reveal itself easily and doesn't stay in one locaton for long.
+Discover all the clues before Mew departs the island.`)
 	fmt.Println("Pick your partner:")
 	fmt.Println("[1] Bulbasaur")
 	fmt.Println("[2] Charmander")
