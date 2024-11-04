@@ -33,7 +33,6 @@ func processInputCatch(state *gameState, input string){
 	}
 
 	pokemon := state.currentPokemon
-	//fmt.Println(pokemon)
 
 	if i == 1{
 		state.escapePercent += 5
@@ -47,11 +46,16 @@ func processInputCatch(state *gameState, input string){
 		fmt.Printf("You throw a pokeball at %s\n", pokemon.name)
 		state.stamina -= 1
 		catch := rand.Intn(100)
-		if catch > state.catchPercent{
-			fmt.Printf("%s was caught!\n", pokemon.name)
-			state.pokemon = append(state.pokemon, pokemon)
-			state.scene = Location
-			return
+		if catch < state.catchPercent{
+
+			if len(state.pokemon) == 6{
+				state.scene = Release
+			}else{
+				fmt.Printf("%s was caught!\n", pokemon.name)
+				state.pokemon = append(state.pokemon, pokemon)
+				state.scene = Location
+				return
+			}
 		}else{
 			fmt.Printf("%s escaped the pokeball!\n", pokemon.name)
 		}
@@ -60,7 +64,7 @@ func processInputCatch(state *gameState, input string){
 		return
 	}
 	escape := rand.Intn(100)
-	if escape > state.escapePercent{
+	if escape < state.escapePercent{
 		fmt.Printf("%s has fled!\n", pokemon.name)
 		state.scene = Location
 		return

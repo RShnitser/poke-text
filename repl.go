@@ -14,24 +14,10 @@ const (
 	Travel
 	Location
 	Capture
+	Release
 	Stamina
 	Time
 )
-
-// type Ability string
-// const (
-// 	Cut Ability = "Cut"
-// 	Surf Ability = "Surf"
-// 	Strength Ability = "Strength"
-// 	Flash Ability = "Flash"
-// 	Defog Ability = "Defog"
-// 	RockSmash Ability = "Rock Smash"
-// 	Climb Ability = "Climb"
-// 	Fly Ability = "Fly"
-// 	Whirlpool Ability = "Whirlpool"
-// 	Waterfall Ability = "Waterfall"
-// 	Dive Ability = "Dive"
-// )
 
 type Ability int
 const (
@@ -53,18 +39,12 @@ type Obstacle struct{
 	solution Ability
 }
 
-//type obstacleHandle int
 type LocationData struct{
 	name string
-	//completed bool
+
 	obstacles []Ability
 	pokemon []pokemon
 }
-
-
-// type ability struct{
-// 	name string
-// }
 
 type pokemon struct{
 	name string
@@ -77,7 +57,6 @@ type gameData struct{
 	locations []LocationData
 }
 
-//type obstacleHandle int
 type LocationState struct{
 	dataIndex int
 	name string
@@ -169,12 +148,10 @@ func (state *gameState)init(){
 		locState.completed = false
 		locState.name = loc.name
 		locState.path = []Ability{}
-		//locState.path = []int{}
 
 		for i := 0; i < 5; i++{
 			randomObstacle := rand.Intn(len(loc.obstacles))
 			locState.path = append(locState.path, loc.obstacles[randomObstacle])
-			//location.path =  append(locState.path, loc.obstacles[randomObstacle])
 		}
 		state.locations = append(state.locations, locState)
 	}
@@ -187,33 +164,6 @@ func getInput(scanner *bufio.Scanner)string{
 	return input
 }
 
-func printStart(){
-	fmt.Println("Pick your partner:")
-	fmt.Println("[1] Bulbasaur")
-	fmt.Println("[2] Charmander")
-	fmt.Println("[3] Squirtle")
-}
-
-func processInputStart(state *gameState, input string){
-	
-	valid := true
-	switch(input){
-		case "1":
-			state.pokemon = append(state.pokemon, pokemon{"Bulbasaur", []Ability{Cut, RockSmash}})
-		case "2":
-			state.pokemon = append(state.pokemon, pokemon{"Charmander", []Ability{Strength, Flash}})
-		case "3":
-			state.pokemon = append(state.pokemon, pokemon{"Squirtle", []Ability{Surf, Dive}})
-		default:
-			valid = false
-	}
-	if valid{
-		state.scene = Travel
-	}
-}
-
-
-
 func printState(state *gameState){
 	switch(state.scene){
 	case Start:
@@ -224,6 +174,8 @@ func printState(state *gameState){
 		printLocation(state)
 	case Capture:
 		printCatch(state)
+	case Release:
+		printRelease(state)
 	case Stamina:
 		printStamina(state)
 	}
@@ -239,6 +191,8 @@ func processInput(state *gameState, input string){
 		processInputLocation(state, input)
 	case Capture:
 		processInputCatch(state, input)
+	case Release:
+		processInputRelease(state, input)
 	case Stamina:
 		processInputStamina(state, input)
 	}
@@ -266,6 +220,5 @@ func (state *gameState)run(){
 				fmt.Printf("\n")
 			}
 		}
-		//fmt.Println(input)
 	}
 }
