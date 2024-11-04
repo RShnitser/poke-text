@@ -73,6 +73,7 @@ func processInputLocation(state *gameState, input string){
 		}
 		return
 	}else if i == 3{
+		state.locations[state.currentLocation].progress += 1
 		fmt.Println("exiting")
 		state.scene = Travel
 		return

@@ -3,7 +3,7 @@ package main
 import(
 	"fmt"
 	"strconv"
-	//"math/rand"
+	"math/rand"
 )
 
 func printCatch(state *gameState){
@@ -32,44 +32,42 @@ func processInputCatch(state *gameState, input string){
 		return
 	}
 
-	//pokemon := state.currentPokemon
+	pokemon := state.currentPokemon
 	//fmt.Println(pokemon)
 
-	// if i == 1{
-	// 	state.escapePercent += 5
-	// 	state.catchPercent += 5
-	// 	state.stamina -= 1
-	// }else if i == 2{
-	// 	state.escapePercent -= 5
-	// 	state.catchPercent -= 5
-	// 	state.stamina -= 1
-	// }else if i == 3{
-	// 	state.stamina -= 1
-	// 	catch := rand.Intn(100)
-	// 	if catch > state.catchPercent{
-	// 		fmt.Printf("%s was caught!\n", pokemon.name)
-	// 		state.pokemon = append(state.pokemon, pokemon)
-	// 		state.scene = Location
-	// 		return
-	// 	}else{
-	// 		fmt.Printf("%s escaped the pokeball!\n", pokemon.name)
-	// 	}
-	// }else if i == 4{
-	// 	state.scene = Location
-	// 	return
-	// }
-	// escape := rand.Intn(100)
-	// if escape > state.escapePercent{
-	// 	fmt.Printf("%s has fled!\n", pokemon.name)
-	// 	state.scene = Location
-	// 	return
-	// }
+	if i == 1{
+		state.escapePercent += 5
+		state.catchPercent += 5
+		state.stamina -= 1
+	}else if i == 2{
+		state.escapePercent -= 5
+		state.catchPercent -= 5
+		state.stamina -= 1
+	}else if i == 3{
+		fmt.Printf("You throw a pokeball at %s\n", pokemon.name)
+		state.stamina -= 1
+		catch := rand.Intn(100)
+		if catch > state.catchPercent{
+			fmt.Printf("%s was caught!\n", pokemon.name)
+			state.pokemon = append(state.pokemon, pokemon)
+			state.scene = Location
+			return
+		}else{
+			fmt.Printf("%s escaped the pokeball!\n", pokemon.name)
+		}
+	}else if i == 4{
+		state.scene = Location
+		return
+	}
+	escape := rand.Intn(100)
+	if escape > state.escapePercent{
+		fmt.Printf("%s has fled!\n", pokemon.name)
+		state.scene = Location
+		return
+	}
 
-	// if state.stamina <= 0 {
-	// 	fmt.Println("You and your pokemon are too exhausted to continue any further and must leave the area to rest")
-	// 	state.stamina = 20
-	// 	state.daysLeft -= 2
-	// 	state.scene = Travel
-	// }
+	if state.stamina <= 0 {
+		state.scene = Stamina
+	}
 
 }

@@ -224,6 +224,8 @@ func printState(state *gameState){
 		printLocation(state)
 	case Capture:
 		printCatch(state)
+	case Stamina:
+		printStamina(state)
 	}
 }
 
@@ -237,6 +239,8 @@ func processInput(state *gameState, input string){
 		processInputLocation(state, input)
 	case Capture:
 		processInputCatch(state, input)
+	case Stamina:
+		processInputStamina(state, input)
 	}
 }
 
@@ -251,6 +255,16 @@ func (state *gameState)run(){
 		if input == "exit"{
 			state.running = false
 			return
+		}else if input == "status"{
+			fmt.Printf("stamina: %d, days left: %d\n", state.stamina, state.daysLeft)
+		}else if input == "pokemon"{
+			for _, pokemon := range state.pokemon{
+				fmt.Printf("%s", pokemon.name)
+				for _, ability := range pokemon.abilities{
+					fmt.Printf(" %s ", state.data.abilityName[ability])
+				}
+				fmt.Printf("\n")
+			}
 		}
 		//fmt.Println(input)
 	}
