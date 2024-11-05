@@ -9,29 +9,34 @@ import(
 func printLocation(state *gameState){
 	loc := state.locations[state.currentLocation]
 
-	fmt.Println(state.data.obstacles[loc.path[loc.progress]].description)
-	//name := ""
-	cost := 5
-	message := "Force your way through"
+	if !loc.completed{
+		fmt.Println(state.data.obstacles[loc.path[loc.progress]].description)
+		cost := 5
+		message := "Force your way through"
 
-	Loop:
-	for _, pokemon := range state.pokemon{
-		for _, ability := range pokemon.abilities{
-			if loc.path[loc.progress] == ability{
-				cost = 1
-				abilityName, ok := state.data.abilityName[ability]
-				if !ok{
-					abilityName = "UNKNOWN"
+		Loop:
+		for _, pokemon := range state.pokemon{
+			for _, ability := range pokemon.abilities{
+				if loc.path[loc.progress] == ability{
+					cost = 1
+					abilityName, ok := state.data.abilityName[ability]
+					if !ok{
+						abilityName = "UNKNOWN"
+					}
+					message = fmt.Sprintf("%s uses %s", pokemon.name, abilityName)
+					break Loop
 				}
-				message = fmt.Sprintf("%s uses %s", pokemon.name, abilityName)
-				break Loop
 			}
 		}
+		state.currentCost = cost
+		fmt.Printf("[1] %s (-%d stamina)\n", message, cost)
+		fmt.Printf("[2] Search for pokemon (-1 stamina)\n")
+		fmt.Printf("[3] Leave the %s\n", loc.name)
+	}else{
+		fmt.Println("You have discovered the clue in this area")
+		fmt.Printf("[1] Search for pokemon (-1 stamina)\n")
+		fmt.Printf("[2] Leave the %s\n", loc.name)
 	}
-	state.currentCost = cost
-	fmt.Printf("[1] %s (-%d stamina)\n", message, cost)
-	fmt.Printf("[2] Search for pokemon (-1 stamina)\n")
-	fmt.Printf("[3] Leave the %s\n", loc.name)
 }
 
 func processInputLocation(state *gameState, input string){
@@ -39,8 +44,16 @@ func processInputLocation(state *gameState, input string){
 	if err != nil{
 		return
 	}
-	if i < 1 || i > 3{
-		return
+
+	if !state.locations[state.currentLocation].completed{
+		if i < 1 || i > 3{
+			return
+		}
+	}else{
+		if i < 1 || i > 2{
+			return
+		}
+		i += 1
 	}
 
 	if i == 1{
@@ -54,8 +67,20 @@ func processInputLocation(state *gameState, input string){
 		state.locations[state.currentLocation].progress += 1
 		if state.locations[state.currentLocation].progress == 5{
 			state.locations[state.currentLocation].completed = true
-			state.scene = Travel
 			fmt.Println("You have found a clue to Mew's location!")
+			win := true
+			for _, loc := range state.locations{
+				if !loc.completed{
+					win = false
+					break
+				}
+			}
+			if win{
+				state.scene = Win
+			}else{
+				state.scene = Travel
+			}
+			return
 		}
 	}else if i == 2{
 		data := state.data.locations[state.locations[state.currentLocation].dataIndex]
@@ -73,7 +98,7 @@ func processInputLocation(state *gameState, input string){
 		}
 		return
 	}else if i == 3{
-		state.locations[state.currentLocation].progress += 1
+		state.locations[state.currentLocation].progress = 0
 		fmt.Println("exiting")
 		state.scene = Travel
 		return

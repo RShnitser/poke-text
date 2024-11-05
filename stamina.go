@@ -14,9 +14,9 @@ func processInputStamina(state *gameState, input string){
 	state.stamina = 20
 	state.daysLeft -= 2
 
-	// if state.daysLeft > 0{
-	state.scene = Travel
-	// }else{
-	// 	state.scene = Time
-	// }
+	if state.daysLeft > 0{
+		state.scene = Travel
+	}else{
+		state.scene = Lose
+	}
 }

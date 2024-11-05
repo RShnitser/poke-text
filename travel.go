@@ -31,7 +31,7 @@ func processInputTravel(state *gameState, input string){
 		state.daysLeft -= 1
 		fmt.Println("You rest and recover your stamina")
 		if state.daysLeft == 0{
-			//state.scene = Time
+			state.scene = Lose
 		}
 	}
 }

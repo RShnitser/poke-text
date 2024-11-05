@@ -16,7 +16,8 @@ const (
 	Capture
 	Release
 	Stamina
-	Time
+	Lose
+	Win
 )
 
 type Ability int
@@ -178,6 +179,10 @@ func printState(state *gameState){
 		printRelease(state)
 	case Stamina:
 		printStamina(state)
+	case Lose:
+		printLose(state)
+	case Win:
+		printWin(state)
 	}
 }
 
@@ -195,6 +200,10 @@ func processInput(state *gameState, input string){
 		processInputRelease(state, input)
 	case Stamina:
 		processInputStamina(state, input)
+	case Lose:
+		processInputLose(state, input)
+	case Win:
+		processInputWin(state, input)
 	}
 }
 
